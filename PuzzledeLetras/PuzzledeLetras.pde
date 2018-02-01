@@ -33,9 +33,11 @@ int status = 0;
 boolean fake = true;
 
 int startTime = millis();
+int figureTime = millis();
+
 void setup() {
-  //size(300, 300);
-  fullScreen();
+  size(300, 300);
+  //fullScreen();
   randomSeed(millis());
   noCursor();
 
@@ -65,18 +67,25 @@ void draw() {
   drawFacadeContourInside(); //Facade Contour
 
   int timeElapsed = millis() - startTime;
-  if (timeElapsed > 3000) {
+  int figureTimeElapsed = millis() - figureTime;
+  if (figureTimeElapsed > 3000) {
     puzzle.initFigure();
-    startTime = millis();
+    figureTime = millis();
   }
 
   switch(status) {
   case 0:
     intro.draw();
+    if (timeElapsed > 15 * 1000) {
+      status = 1;
+      startTime = millis();
+    }
     break;
   case 1:
     update();
-    //puzzle.drawFigure();
+    if (fake) {
+      puzzle.drawFigure();
+    }
     puzzle.drawBoxMatrix();
 
     image(img, offsetX, offsetY);
@@ -84,14 +93,25 @@ void draw() {
     stroke(255, 0, 0);
     noFill();
 
-    if (fake) {  
+    if (fake) {   //<>//
       rect(currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y);
     } else {
       draw_clientSensor4Games(widthDesiredScale, heightDesiredScale, 0.3, true);
     }
+    if (timeElapsed > 60 * 1000) {
+      println("Filling the image and changing to mode 2");
+      puzzle.fill();
+      startTime = millis();
+      status = 2;
+    }
     break;
   case 2:
-    status = 0;
+    if (timeElapsed > 5 * 1000) {
+      println("Clearing the canvas");  
+      puzzle.clear();
+      img = loadImage("img0"+(int)random(1, 9)+".jpg");
+      status = 0;
+    }
     break;
   }
 }
@@ -151,19 +171,26 @@ void keyPressed() {
   if (keyCode=='1') {
     status = 0;
   }
-  if (keyCode == '2') {
+  if (keyCode == '2') { // Start game
     status = 1;
   }
-  if (keyCode == '3') {
+  if (keyCode == 73) { // 'i' change image
     img = loadImage("img0"+(int)random(1, 9)+".jpg");
   }
-  if (keyCode == '4') {
+  if (keyCode == 67) { // 'c' clear image
     puzzle.clear();
   }
-  if (keyCode == '5') {
+  if (keyCode == 69) { // 'e' // End game 
+    println("Finish game");
     puzzle.fill();
+    //startTime = millis();
+    //status = 2;
   }
-  if (keyCode == '6') {
+  if (keyCode == 71) { // 'e' // End game 
+    startTime = millis();
+    status = 2;
+  }
+  if (keyCode == 70) { // 'f' (to toggle fake mode)
     println("Changing fake mode to" + !fake);
     fake = !fake;
   }
@@ -177,8 +204,5 @@ void keyPressed() {
 public void pre() {
   // Calculate time difference since last call
   float elapsedTime = (float) sw.getElapsedTime();
-  //processCollisions();
-  //if (nbr_dead == NBR_GHOSTS)
-  //  initGhosts();
   S4P.updateSprites(elapsedTime);
 }
