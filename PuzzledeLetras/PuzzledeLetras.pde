@@ -1,34 +1,54 @@
+import sprites.*;
+import sprites.maths.*;
+import sprites.utils.*;
+
 int widthDesiredScale = 192;
 int heightDesiredScale = 157;
 Boolean bBackgroundAlpha = false;
 int alphaBk = 200;
 
+// Number of columns
 int dimW = 24;
+// Numbers of rows
 int dimH = 15;
+// Gap between puzzle boxes X
 int gapX = 8;
+// Gap between puzzle boxes X
 int gapY = 8;
+
+// Offset in X of the right corner of the Facade
+int offsetX = 40;
+// Offset in Y of the right corner of the Facade
+int offsetY = 74;
 
 PImage img;
 
 PVector currentRect;
 PVector dimCurrentRect;
 
-Grid grid = new Grid();
+Intro intro = new Intro(this);
+Puzzle puzzle = new Puzzle();
+Sprite llama;
+int status = 0;
 
-void setup(){
-    size(640, 360);
+int startTime = millis();
+void setup() {
+  size(300, 300);
+  randomSeed(millis());
+  noCursor();
 
-  grid.setup(dimW,dimH,gapX,gapY,40,74);
-  
-  img = loadImage("moonwalk.jpg");
+  intro.setup();
+  puzzle.setup(dimW, dimH, gapX, gapY, offsetX, offsetY);
+  img = loadImage("foto.jpg");
   
   //Current
   currentRect = new PVector(0, 0);
-  dimCurrentRect = new PVector(30, 60);
+  dimCurrentRect = new PVector(15, 20);
+  puzzle.initFigure();
 }
 
-void draw(){
-if (bBackgroundAlpha) {
+void draw() {
+  if (bBackgroundAlpha) {
     fill(0, 0, 0, alphaBk);
     rectMode(CORNER);
     rect(0, 0, widthDesiredScale+40, heightDesiredScale+40);
@@ -37,15 +57,32 @@ if (bBackgroundAlpha) {
   strokeWeight(1);
   stroke(0, 255, 255); //RGB Contour Color. https://processing.org/reference/stroke_.html
   drawFacadeContourInside(); //Facade Contour
-  update();
-  grid.drawBoxMatrix();
-  
-  image(img, 0, 0);
-  img.mask(grid.getMask());
-  stroke(255,0,0);
-  noFill();
-  rect(currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y);
 
+  int timeElapsed = millis()-startTime;
+  if (timeElapsed > 3000) {
+    puzzle.initFigure();
+    startTime = millis();
+  }
+
+  switch(status) {
+  case 0:
+    intro.draw();
+    break;
+  case 1:
+    update();
+    puzzle.drawFigure();
+    puzzle.drawBoxMatrix();
+
+    image(img, offsetX, offsetY);
+    img.mask(puzzle.getMask());
+    stroke(255, 0, 0);
+    noFill();
+    rect(currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y);
+    break;
+  case 2:
+    status = 0;
+    break;
+  }
 }
 
 
@@ -57,10 +94,38 @@ void update() {
   {
     for ( int c = 0; c < dimH; c++ ) // columns per row
     {
-      if(rectRect(r*gapX, c*gapY, gapX-1, gapY-1,
-      currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y) == true){
-        grid.set(r,c);
+      if (puzzle.getFigure(r, c)) {
+        if (rectRect(r*gapX+offsetX, c*gapY + offsetY, gapX-1, gapY-1, 
+          currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y) == true) {
+          puzzle.set(r, c);
+        }
       }
     }
   }
+}
+
+void keyPressed(){
+  if(keyCode=='1'){
+    status = 0;
+  }
+  if(keyCode == '2'){
+    status = 1;
+  }
+  if(keyCode == '3'){
+    status = 2;
+  }
+}
+/*
+ * Method provided by Processing and is called every 
+ * loop before the draw method. It has to be activated
+ * with the following statement in setup() <br>
+ * <pre>registerMethod("pre", this);</pre>
+ */
+public void pre() {
+  // Calculate time difference since last call
+  float elapsedTime = (float) sw.getElapsedTime();
+  //processCollisions();
+  //if (nbr_dead == NBR_GHOSTS)
+  //  initGhosts();
+  S4P.updateSprites(elapsedTime);
 }
