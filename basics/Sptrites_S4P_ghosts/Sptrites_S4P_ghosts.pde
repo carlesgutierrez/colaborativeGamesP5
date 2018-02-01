@@ -1,3 +1,21 @@
+//TODOs
+
+//Change trap por Shepherd Strites 
+//Set Mouse position // after X, Y by osc. 
+
+// lerped pos
+//float drag = 30.0;
+//float dx = mouseX - xpos;
+//xpos = xpos + dx/drag;
+
+//Add brownian small setVelXY to ghosts...Internally does: location = location + velocity 
+//+ brownian mov --> newPositionX += random(-range, range);
+//Modif setDomain for facade player area
+
+//Check calc Vector Collision Sheppherd with Sheep. Check LerpVector
+//Add add this vector to actual vector sheep 
+
+
 import sprites.utils.*;
 import sprites.maths.*;
 import sprites.*;
