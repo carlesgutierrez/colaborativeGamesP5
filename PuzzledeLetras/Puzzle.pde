@@ -129,12 +129,14 @@ class Puzzle {
     }
 
     int figureIndex = (int) random(figures.length)/4;
-    println(figureIndex);
     for (int r=x,i=0; r<x+4; r++,i++ ) {
       for ( int c = y,j=0; c < y+4; c++,j++ ) {
+        /*
         if (figures[figureIndex+i+j]==1) {
           figureMask[r][c] = true;
         }
+        */
+        figureMask[r][c] = true;
       }
     }
   }

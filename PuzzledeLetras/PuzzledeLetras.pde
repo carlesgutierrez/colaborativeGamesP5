@@ -30,21 +30,25 @@ Intro intro = new Intro(this);
 Puzzle puzzle = new Puzzle();
 Sprite llama;
 int status = 0;
+boolean fake = true;
 
 int startTime = millis();
 void setup() {
-  size(300, 300);
+  //size(300, 300);
+  fullScreen();
   randomSeed(millis());
   noCursor();
 
   intro.setup();
   puzzle.setup(dimW, dimH, gapX, gapY, offsetX, offsetY);
-  img = loadImage("foto.jpg");
-  
+  img = loadImage("img07.jpg");
+
   //Current
   currentRect = new PVector(0, 0);
   dimCurrentRect = new PVector(15, 20);
   puzzle.initFigure();
+
+  setup_clientSensor4Games();
 }
 
 void draw() {
@@ -52,13 +56,15 @@ void draw() {
     fill(0, 0, 0, alphaBk);
     rectMode(CORNER);
     rect(0, 0, widthDesiredScale+40, heightDesiredScale+40);
-  } else background(0, 0, 0);
+  } else {
+    background(0, 0, 0);
+  }
 
   strokeWeight(1);
   stroke(0, 255, 255); //RGB Contour Color. https://processing.org/reference/stroke_.html
   drawFacadeContourInside(); //Facade Contour
 
-  int timeElapsed = millis()-startTime;
+  int timeElapsed = millis() - startTime;
   if (timeElapsed > 3000) {
     puzzle.initFigure();
     startTime = millis();
@@ -77,7 +83,12 @@ void draw() {
     img.mask(puzzle.getMask());
     stroke(255, 0, 0);
     noFill();
-    rect(currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y);
+
+    if (fake) {  
+      rect(currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y);
+    } else {
+      draw_clientSensor4Games(widthDesiredScale, heightDesiredScale, 0.3, true);
+    }
     break;
   case 2:
     status = 0;
@@ -87,6 +98,13 @@ void draw() {
 
 
 void update() {
+  if (fake) {
+    updateMouse();
+  } else {
+    updateOSC();
+  }
+}
+void updateMouse() {
   currentRect.set(mouseX, mouseY);
 
   //Update Current PG white boxes if collide with currentBox
@@ -104,15 +122,45 @@ void update() {
   }
 }
 
-void keyPressed(){
-  if(keyCode=='1'){
+void updateOSC() {
+  float Rscale = 0.2;
+
+  //Update Current PG white boxes if collide with currentBox
+  for (int r=0; r<dimW; r++ ) // rows
+  {
+    for ( int c = 0; c < dimH; c++ ) // columns per row
+    {
+      // get acces to Blobs
+      synchronized (blobs) {
+        for (YoloBlob auxBlob : blobs) {
+          //auxBlob.displaySpoutRects(dimW, dimH, 0.2);
+          if (puzzle.getFigure(r, c)) {
+            if (rectRect(r*gapX+offsetX, c*gapY + offsetY, gapX-1, gapY-1, 
+              auxBlob.xPos*192 +offsetX, auxBlob.yPos*125 + offsetY, auxBlob.wRawBlob*Rscale, auxBlob.hRawBlob*Rscale) == true) {
+              //currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y) == true) {
+              puzzle.set(r, c);
+            }
+          }
+        }//for Blobs
+      }// synchronized
+    }
+    println("-----");
+  }
+}
+
+void keyPressed() {
+  if (keyCode=='1') {
     status = 0;
   }
-  if(keyCode == '2'){
+  if (keyCode == '2') {
     status = 1;
   }
-  if(keyCode == '3'){
+  if (keyCode == '3') {
     status = 2;
+  }
+  if (keyCode == '4') {
+    println("Changing fake mode to" + !fake);
+    fake = !fake;
   }
 }
 /*
