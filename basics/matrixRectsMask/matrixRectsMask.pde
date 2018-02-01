@@ -97,6 +97,9 @@ void draw ()
   
   image(img, 0, 0);
   img.mask(pgToDraw);
+  stroke(255,0,0);
+  noFill();
+  rect(currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y);
 }
 
 // RECTANGLE/RECTANGLE
