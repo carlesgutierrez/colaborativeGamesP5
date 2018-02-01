@@ -28,13 +28,13 @@ void draw_clientSensor4Games(int w, int h, float _scaleRaWBlobSize, Boolean _bDr
       //auxBlob.displayRandomColorRect(w, h, _scaleRaWBlobSize);
       
       //Draw Spout Texture and Rects
-      //auxBlob.displaySpoutRects(w, h, _scaleRaWBlobSize);
+      auxBlob.displaySpoutRects(w, h, _scaleRaWBlobSize);
       
       //Random Colored Circles 
       //auxBlob.displayRandomColorCircles(w, h, _scaleRaWBlobSize);
       
       //Random Colored Circles + Actions W/H
-      auxBlob.displayActionCircles(w, h, _scaleRaWBlobSize);
+      //auxBlob.displayActionCircles(w, h, _scaleRaWBlobSize);
       
       //Draw Info
       if (_bDrawInfo) {
