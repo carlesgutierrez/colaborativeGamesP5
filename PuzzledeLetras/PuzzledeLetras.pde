@@ -41,7 +41,7 @@ void setup() {
 
   intro.setup();
   puzzle.setup(dimW, dimH, gapX, gapY, offsetX, offsetY);
-  img = loadImage("img07.jpg");
+  img = loadImage("img01.jpg");
 
   //Current
   currentRect = new PVector(0, 0);
@@ -135,11 +135,11 @@ void updateOSC() {
         for (YoloBlob auxBlob : blobs) {
           //auxBlob.displaySpoutRects(dimW, dimH, 0.2);
           //if (puzzle.getFigure(r, c)) {
-            if (rectRect(r*gapX+offsetX, c*gapY + offsetY, gapX-1, gapY-1, 
-              auxBlob.xPos*192 +offsetX, auxBlob.yPos*125 + offsetY, auxBlob.wRawBlob*Rscale, auxBlob.hRawBlob*Rscale) == true) {
-              //currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y) == true) {
-              puzzle.set(r, c);
-            }
+          if (rectRect(r*gapX+offsetX, c*gapY + offsetY, gapX-1, gapY-1, 
+            auxBlob.xPos*192 +offsetX, auxBlob.yPos*125 + offsetY, auxBlob.wRawBlob*Rscale, auxBlob.hRawBlob*Rscale) == true) {
+            //currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y) == true) {
+            puzzle.set(r, c);
+          }
           //}
         }//for Blobs
       }// synchronized
@@ -155,7 +155,9 @@ void keyPressed() {
     status = 1;
   }
   if (keyCode == '3') {
-    status = 2;
+    img = loadImage("img0"+(int)random(1, 9)+".jpg");
+  }
+  if (keyCode == '4') {
     puzzle.clear();
   }
   if (keyCode == '5') {
@@ -165,7 +167,6 @@ void keyPressed() {
     println("Changing fake mode to" + !fake);
     fake = !fake;
   }
-  
 }
 /*
  * Method provided by Processing and is called every 
