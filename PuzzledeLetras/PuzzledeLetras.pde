@@ -1,4 +1,4 @@
-import sprites.*;
+import sprites.*; //<>//
 import sprites.maths.*;
 import sprites.utils.*;
 
@@ -36,8 +36,8 @@ int startTime = millis();
 int figureTime = millis();
 
 void setup() {
-  size(300, 300);
-  //fullScreen();
+  //size(300, 300);
+  fullScreen();
   randomSeed(millis());
   noCursor();
 
@@ -93,7 +93,7 @@ void draw() {
     stroke(255, 0, 0);
     noFill();
 
-    if (fake) {   //<>//
+    if (fake) {  
       rect(currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y);
     } else {
       draw_clientSensor4Games(widthDesiredScale, heightDesiredScale, 0.3, true);
@@ -111,6 +111,9 @@ void draw() {
       puzzle.clear();
       img = loadImage("img0"+(int)random(1, 9)+".jpg");
       status = 0;
+    } else {
+      image(img, offsetX, offsetY);
+      img.mask(puzzle.getMask());
     }
     break;
   }
