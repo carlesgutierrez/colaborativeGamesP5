@@ -159,7 +159,23 @@ class Puzzle {
     pgToDraw.endDraw();
   }
 
-  void set(int x, int y) {
+  void clear(){
+    for (int r=0; r<dimW; r++ ) {
+      for ( int c = 0; c < dimH; c++ ) {
+        rects[r][c] = false;
+      }
+    }
+  }
+
+    void fill(){
+    for (int r=0; r<dimW; r++ ) {
+      for ( int c = 0; c < dimH; c++ ) {
+        rects[r][c] = true;
+      }
+    }
+  }
+
+void set(int x, int y) {
     rects[x][y]=true;
   }
 

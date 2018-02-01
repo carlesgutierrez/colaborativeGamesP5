@@ -76,7 +76,7 @@ void draw() {
     break;
   case 1:
     update();
-    puzzle.drawFigure();
+    //puzzle.drawFigure();
     puzzle.drawBoxMatrix();
 
     image(img, offsetX, offsetY);
@@ -134,17 +134,16 @@ void updateOSC() {
       synchronized (blobs) {
         for (YoloBlob auxBlob : blobs) {
           //auxBlob.displaySpoutRects(dimW, dimH, 0.2);
-          if (puzzle.getFigure(r, c)) {
+          //if (puzzle.getFigure(r, c)) {
             if (rectRect(r*gapX+offsetX, c*gapY + offsetY, gapX-1, gapY-1, 
               auxBlob.xPos*192 +offsetX, auxBlob.yPos*125 + offsetY, auxBlob.wRawBlob*Rscale, auxBlob.hRawBlob*Rscale) == true) {
               //currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y) == true) {
               puzzle.set(r, c);
             }
-          }
+          //}
         }//for Blobs
       }// synchronized
     }
-    println("-----");
   }
 }
 
@@ -157,11 +156,16 @@ void keyPressed() {
   }
   if (keyCode == '3') {
     status = 2;
+    puzzle.clear();
   }
-  if (keyCode == '4') {
+  if (keyCode == '5') {
+    puzzle.fill();
+  }
+  if (keyCode == '6') {
     println("Changing fake mode to" + !fake);
     fake = !fake;
   }
+  
 }
 /*
  * Method provided by Processing and is called every 
