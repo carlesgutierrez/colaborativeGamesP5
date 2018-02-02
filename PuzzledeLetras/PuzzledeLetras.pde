@@ -1,4 +1,6 @@
-import sprites.*;   //<>//
+import lord_of_galaxy.timing_utils.*;  //<>//
+
+import sprites.*;
 import sprites.maths.*;
 import sprites.utils.*;
 
@@ -18,16 +20,14 @@ final int OFFSET_Y = 74;
 
 final int STATUS_INTRO = 0;
 final int STATUS_PLAYING = 1;
-final int STATUS_IMAGE = 2;
-final int STATUS_RESTART = 3;
+final int STATUS_RESTART = 2;
 
 final char KEY_INTRO = '1';
 final char KEY_PLAY = '2';
-final int KEY_IMAGE = 73;
-final int KEY_CLEAR = 67;
-final int KEY_END_GAME = 69;
-final int KEY_RESTART = 71;
-final int KEY_FAKE = 70;
+final int KEY_IMAGE_I = 73;     //   'i'
+final int KEY_CLEAR_C = 67;     //   'c'
+final int KEY_END_GAME_E = 69;  //   'e'
+final int KEY_FAKE_F = 70;      //   'f'
 
 // Gap between puzzle boxes X
 int gapX = 8;
@@ -44,15 +44,15 @@ Puzzle puzzle = new Puzzle();
 Sprite llama;
 
 int status = STATUS_INTRO;
-boolean fake = true;
+boolean fake = false;
 String images[];
 
-int startTime = millis();
-int figureTime = millis();
+Stopwatch timer;
+Stopwatch figureTimer;
 
 void setup() {
-  size(300, 300);
-  //fullScreen();
+  //size(300, 300);
+  fullScreen();
   randomSeed(millis());
   noCursor();
 
@@ -68,6 +68,12 @@ void setup() {
   puzzle.initFigure();
 
   setup_clientSensor4Games();
+
+  timer = new Stopwatch(this);
+  timer.start();
+
+  figureTimer = new Stopwatch(this);
+  figureTimer.start();
 }
 
 void draw() {
@@ -83,57 +89,46 @@ void draw() {
   stroke(0, 255, 255); //RGB Contour Color. https://processing.org/reference/stroke_.html
   drawFacadeContourInside(); //Facade Contour
 
-  int timeElapsed = millis() - startTime;
-  int figureTimeElapsed = millis() - figureTime;
-  if (figureTimeElapsed > 3000) {
+  if (figureTimer.second() == 3) {
     puzzle.initFigure();
-    figureTime = millis();
+    figureTimer.restart();
   }
 
   switch(status) {
   case STATUS_INTRO:
+    //TODO Init and restart the intro 'correctly'
     intro.draw();
-    if (timeElapsed > 15 * 1000) {
+    if (timer.second() == 15) {
       status = STATUS_PLAYING;
-      startTime = millis();
+      timer.restart();
     }
     break;
   case STATUS_PLAYING:
     update();
-    if (fake) {
-      puzzle.drawFigure();
-    }
-    puzzle.drawBoxMatrix();
 
-    image(img, OFFSET_X, OFFSET_Y);
-    img.mask(puzzle.getMask());
-    stroke(255, 0, 0);
-    noFill();
-
-    if (fake) {
-      rect(currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y);
-    } else {
-      draw_clientSensor4Games(widthDesiredScale, heightDesiredScale, 0.3, true);
-    }
-    if (timeElapsed > 60 * 1000) {
+    if (timer.minute() == 1) {
       println("Filling the image and changing to mode 2");
       puzzle.fill();
-      status = STATUS_IMAGE;
+      status = STATUS_RESTART;
+      timer.restart();
+    } else {
+      if (fake) {
+        puzzle.drawFigure();
+        rect(currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y);
+      } else {
+        draw_clientSensor4Games(widthDesiredScale, heightDesiredScale, 0.3, true);
+      }
+      drawImage();
     }
     break;
-  case STATUS_IMAGE:
-    startTime = millis();
-    status = STATUS_RESTART;
-    break;
   case STATUS_RESTART:
-    if (timeElapsed > 5 * 1000) {
+    if (timer.second() >= 5) {
       println("Clearing the canvas");
       puzzle.clear();
       initImage();
       status = 0;
     } else {
-      image(img, OFFSET_X, OFFSET_Y);
-      img.mask(puzzle.getMask());
+      drawImage();
     }
     break;
   }
@@ -148,30 +143,24 @@ void keyPressed() {
   case  KEY_PLAY: // Start game
     status = STATUS_PLAYING;
     break;
-  case  KEY_IMAGE: // 'i' change image
+  case  KEY_IMAGE_I: // 'i' change image
     initImage();
     break;
-  case  KEY_CLEAR: // 'c' clear image
+  case  KEY_CLEAR_C: // 'c' clear image
     puzzle.clear();
     break;
-  case  KEY_END_GAME: // 'e' // End game
+  case  KEY_END_GAME_E: // 'e' // End game
     println("Finish game");
     puzzle.fill();
-    startTime = millis();
-    //status = 2;
-    break;
-  case  KEY_RESTART: // 'e' // End game
-    startTime = millis();
+    timer.restart();
     status = STATUS_RESTART;
     break;
-  case  KEY_FAKE: // 'f' (to toggle fake mode)
-    println("Changing fake mode to" + !fake);
+  case  KEY_FAKE_F: // 'f' (to toggle fake mode)
+    println("Fake mode: " + !fake);
     fake = !fake;
     break;
   }
 }
-
-
 
 //=============================
 //  Helper functions
@@ -234,7 +223,7 @@ void updateOSC() {
 // Load all available images from the data directory
 // Based on code of Daniel Shiffman (https://www.processing.org/examples/directorylist.html)
 void loadImages() {
-  String path = sketchPath() + "/data" ;  
+  String path = sketchPath() + "/data" ;
   File file = new File(path);
   if (file.isDirectory()) {
     images = file.list();
@@ -252,6 +241,14 @@ void initImage() {
   }
 }
 
+void drawImage() {
+  puzzle.drawBoxMatrix();
+
+  image(img, OFFSET_X, OFFSET_Y);
+  img.mask(puzzle.getMask());
+  stroke(255, 0, 0);
+  noFill();
+}
 /*
  * Method provided by Processing and is called every
  * loop before the draw method. It has to be activated
