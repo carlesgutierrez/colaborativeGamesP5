@@ -1,8 +1,8 @@
 PFont myFont;
 int timeScreenX;
 int timeScreenY;
-int countDownScreenX;
-int countDownScreenY;
+int titleScreenX;
+int titleScreenY;
 final int OFFSET_TEXT_X = 40;
 final int OFFSET_TEXT_Y = 40;
 
@@ -17,10 +17,10 @@ void setupText() {
 void initMessagesPos() {
   //Messages postions reset
   timeScreenX = (widthDesiredScale)/2 + OFFSET_TEXT_X;
-  timeScreenY = 15 + OFFSET_TEXT_Y;
+  timeScreenY = 15 + OFFSET_TEXT_Y - 2;
 
-  countDownScreenX = (widthDesiredScale)/2 + OFFSET_TEXT_X;
-  countDownScreenY = 30 + OFFSET_TEXT_Y;
+  titleScreenX = (widthDesiredScale)/2 + OFFSET_TEXT_X;
+  titleScreenY = 30 + OFFSET_TEXT_Y;
 }
 
 void drawText() {
@@ -33,14 +33,16 @@ void drawText() {
     if (timer.minute() == 1) {
       //ReStart
     } else {
-      text(60-timer.second(), timeScreenX, timeScreenY+2);
+      textSize(20);
+      text(60-timer.second(), timeScreenX, timeScreenY);
     }
     break;
   case STATUS_RESTART:
     if (timer.second() >= 5) {
       //println("Clearing the canvas");
     } else {
-      //TODO or notTODO .... Draw Text Finish? Name of the project?
+      textSize(12);
+      text("Descubre tu Barrio", titleScreenX, titleScreenY);
     }
     break;
   }
