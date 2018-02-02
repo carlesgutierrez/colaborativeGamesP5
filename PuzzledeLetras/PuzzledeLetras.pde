@@ -1,4 +1,4 @@
-import sprites.*; //<>//
+import sprites.*; //<>// //<>// //<>// //<>//
 import sprites.maths.*;
 import sprites.utils.*;
 
@@ -8,18 +8,31 @@ Boolean bBackgroundAlpha = false;
 int alphaBk = 200;
 
 // Number of columns
-int dimW = 24;
+final int COLUMNS = 24;
 // Numbers of rows
-int dimH = 15;
+final int ROWS = 15;
+// Offset in X of the right corner of the Facade
+final int OFFSET_X = 40;
+// Offset in Y of the right corner of the Facade
+final int OFFSET_Y = 74;
+
+final int STATUS_INTRO = 0;
+final int STATUS_PLAYING = 1;
+final int STATUS_IMAGE = 2;
+final int STATUS_RESTART = 3;
+
+final char KEY_INTRO = '1';
+final char KEY_PLAY = '2';
+final int KEY_IMAGE = 73;
+final int KEY_CLEAR = 67;
+final int KEY_END_GAME = 69;
+final int KEY_RESTART = 71;
+final int KEY_FAKE = 70;
+
 // Gap between puzzle boxes X
 int gapX = 8;
 // Gap between puzzle boxes X
 int gapY = 8;
-
-// Offset in X of the right corner of the Facade
-int offsetX = 40;
-// Offset in Y of the right corner of the Facade
-int offsetY = 74;
 
 PImage img;
 
@@ -36,13 +49,13 @@ int startTime = millis();
 int figureTime = millis();
 
 void setup() {
-  //size(300, 300);
-  fullScreen();
+  size(300, 300);
+  //fullScreen();
   randomSeed(millis());
   noCursor();
 
   intro.setup();
-  puzzle.setup(dimW, dimH, gapX, gapY, offsetX, offsetY);
+  puzzle.setup(COLUMNS, ROWS, gapX, gapY, OFFSET_X, OFFSET_Y);
   img = loadImage("img01.jpg");
 
   //Current
@@ -74,26 +87,26 @@ void draw() {
   }
 
   switch(status) {
-  case 0:
+  case STATUS_INTRO:
     intro.draw();
     if (timeElapsed > 15 * 1000) {
-      status = 1;
+      status = STATUS_PLAYING;
       startTime = millis();
     }
     break;
-  case 1:
+  case STATUS_PLAYING:
     update();
     if (fake) {
       puzzle.drawFigure();
     }
     puzzle.drawBoxMatrix();
 
-    image(img, offsetX, offsetY);
+    image(img, OFFSET_X, OFFSET_Y);
     img.mask(puzzle.getMask());
     stroke(255, 0, 0);
     noFill();
 
-    if (fake) {  
+    if (fake) {
       rect(currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y);
     } else {
       draw_clientSensor4Games(widthDesiredScale, heightDesiredScale, 0.3, true);
@@ -101,18 +114,21 @@ void draw() {
     if (timeElapsed > 60 * 1000) {
       println("Filling the image and changing to mode 2");
       puzzle.fill();
-      startTime = millis();
-      status = 2;
+      status = STATUS_IMAGE;
     }
     break;
-  case 2:
+  case STATUS_IMAGE:
+    startTime = millis();
+    status = STATUS_RESTART;
+    break;
+  case STATUS_RESTART:
     if (timeElapsed > 5 * 1000) {
-      println("Clearing the canvas");  
+      println("Clearing the canvas");
       puzzle.clear();
       img = loadImage("img0"+(int)random(1, 9)+".jpg");
       status = 0;
     } else {
-      image(img, offsetX, offsetY);
+      image(img, OFFSET_X, OFFSET_Y);
       img.mask(puzzle.getMask());
     }
     break;
@@ -131,12 +147,12 @@ void updateMouse() {
   currentRect.set(mouseX, mouseY);
 
   //Update Current PG white boxes if collide with currentBox
-  for (int r=0; r<dimW; r++ ) // rows
+  for (int r=0; r<COLUMNS; r++ ) // rows
   {
-    for ( int c = 0; c < dimH; c++ ) // columns per row
+    for ( int c = 0; c < ROWS; c++ ) // columns per row
     {
       if (puzzle.getFigure(r, c)) {
-        if (rectRect(r*gapX+offsetX, c*gapY + offsetY, gapX-1, gapY-1, 
+        if (rectRect(r*gapX+OFFSET_X, c*gapY + OFFSET_Y, gapX-1, gapY-1, 
           currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y) == true) {
           puzzle.set(r, c);
         }
@@ -149,17 +165,17 @@ void updateOSC() {
   float Rscale = 0.2;
 
   //Update Current PG white boxes if collide with currentBox
-  for (int r=0; r<dimW; r++ ) // rows
+  for (int r=0; r<COLUMNS; r++ ) // rows
   {
-    for ( int c = 0; c < dimH; c++ ) // columns per row
+    for ( int c = 0; c < ROWS; c++ ) // columns per row
     {
       // get acces to Blobs
       synchronized (blobs) {
         for (YoloBlob auxBlob : blobs) {
-          //auxBlob.displaySpoutRects(dimW, dimH, 0.2);
+          //auxBlob.displaySpoutRects(COLUMNS, ROWS, 0.2);
           //if (puzzle.getFigure(r, c)) {
-          if (rectRect(r*gapX+offsetX, c*gapY + offsetY, gapX-1, gapY-1, 
-            auxBlob.xPos*192 +offsetX, auxBlob.yPos*125 + offsetY, auxBlob.wRawBlob*Rscale, auxBlob.hRawBlob*Rscale) == true) {
+          if (rectRect(r*gapX+OFFSET_X, c*gapY + OFFSET_Y, gapX-1, gapY-1, 
+            auxBlob.xPos*192 +OFFSET_X, auxBlob.yPos*125 + OFFSET_Y, auxBlob.wRawBlob*Rscale, auxBlob.hRawBlob*Rscale) == true) {
             //currentRect.x, currentRect.y, dimCurrentRect.x, dimCurrentRect.y) == true) {
             puzzle.set(r, c);
           }
@@ -171,35 +187,37 @@ void updateOSC() {
 }
 
 void keyPressed() {
-  if (keyCode=='1') {
-    status = 0;
-  }
-  if (keyCode == '2') { // Start game
-    status = 1;
-  }
-  if (keyCode == 73) { // 'i' change image
+  switch(keyCode) {
+  case KEY_INTRO:
+    status = STATUS_INTRO;
+    break;
+  case  KEY_PLAY: // Start game
+    status = STATUS_PLAYING;
+    break;
+  case  KEY_IMAGE: // 'i' change image
     img = loadImage("img0"+(int)random(1, 9)+".jpg");
-  }
-  if (keyCode == 67) { // 'c' clear image
+    break;
+  case  KEY_CLEAR: // 'c' clear image
     puzzle.clear();
-  }
-  if (keyCode == 69) { // 'e' // End game 
+    break;
+  case  KEY_END_GAME: // 'e' // End game
     println("Finish game");
     puzzle.fill();
-    //startTime = millis();
-    //status = 2;
-  }
-  if (keyCode == 71) { // 'e' // End game 
     startTime = millis();
-    status = 2;
-  }
-  if (keyCode == 70) { // 'f' (to toggle fake mode)
+    //status = 2;
+    break;
+  case  KEY_RESTART: // 'e' // End game
+    startTime = millis();
+    status = STATUS_RESTART;
+    break;
+  case  KEY_FAKE: // 'f' (to toggle fake mode)
     println("Changing fake mode to" + !fake);
     fake = !fake;
+    break;
   }
 }
 /*
- * Method provided by Processing and is called every 
+ * Method provided by Processing and is called every
  * loop before the draw method. It has to be activated
  * with the following statement in setup() <br>
  * <pre>registerMethod("pre", this);</pre>

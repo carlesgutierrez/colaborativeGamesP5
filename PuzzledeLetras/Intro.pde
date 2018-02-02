@@ -5,6 +5,7 @@ StopWatch sw = new StopWatch(); //?
 class Intro {
 
   public PApplet papplet;
+  Sprite llama;
 
   Intro(PApplet aApplet) {
     this.papplet = aApplet;

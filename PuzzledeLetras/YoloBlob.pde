@@ -1,8 +1,8 @@
 class YoloBlob { //<>// //<>//
   float xPos;
   float yPos;
-  int id; 
-  int time; 
+  int id;
+  int time;
   //float probability;
   float wRawBlob;
   float hRawBlob;
@@ -29,10 +29,10 @@ class YoloBlob { //<>// //<>//
   //------------------------------
   void displayBlobInfo(int w, int h) {
     int deltaX = -40;
-    int deltaY = -30; 
+    int deltaY = -30;
     text("["+str(id)+"]"+"("+str(time)+")", xPos*w+deltaX, yPos*h*1+deltaY);
   }
-  
+
   //-------------------------------------------------
   // Custom method for drawing the object
   void displayRandomColorRect(int w, int h, float _scaleRawDims) {
@@ -51,7 +51,7 @@ class YoloBlob { //<>// //<>//
     } else ellipse(xPos*w, yPos*h, 50, 50);
 
   }
-  
+
   //-------------------------------------------------------
   void displaySpoutRects(int w, int h, float _scaleRawDims){
         textAlign(LEFT);
@@ -66,7 +66,7 @@ class YoloBlob { //<>// //<>//
       rect(xPos*w, yPos*h, wRawBlob*_scaleRawDims, hRawBlob*_scaleRawDims);
     } else ellipse(xPos*w, yPos*h, 50, 50);
   }
-  
+
   //-------------------------------------------------
   void displayYoloRects(int w, int h, float _scaleRawDims) {
 
@@ -82,30 +82,30 @@ class YoloBlob { //<>// //<>//
     stroke(idColor, 255, 255, 200);
     strokeWeight(1);
     rectMode(CORNER);  // Set rectMode to CENTER
-    rect(xPos*w + offsetX, yPos*h +offsetY, wRawBlob*_scaleRawDims, hRawBlob*_scaleRawDims);
+    rect(xPos*w + OFFSET_X, yPos*h +OFFSET_Y, wRawBlob*_scaleRawDims, hRawBlob*_scaleRawDims);
 
     // W Status actions feedback
-    strokeWeight(3);  
+    strokeWeight(3);
     //width status
     if (statusActionW < 0)stroke(idColorRed, 255, 255, 200);
     else if (statusActionW > 0)stroke(idColorCyan, 255, 255, 200);
     else {
-      strokeWeight(1);  // 
+      strokeWeight(1);  //
       stroke(idColorCyan, 0, 255, 200);
     }
-    //line(xPos*w+ offsetX, yPos*h + offsetY, xPos*w+wRawBlob*_scaleRawDims, yPos*h);
+    //line(xPos*w+ OFFSET_X, yPos*h + OFFSET_Y, xPos*w+wRawBlob*_scaleRawDims, yPos*h);
 
     // H Status actions feedback
-    strokeWeight(3);  
+    strokeWeight(3);
     if (statusActionH < 0)stroke(idColorRed, 255, 255, 200);
     else if (statusActionH > 0)stroke(idColorCyan, 255, 255, 200);
     else {
-      strokeWeight(1); 
+      strokeWeight(1);
       stroke(idColorCyan, 0, 100, 200);
     }
-    //line(xPos*w + offsetX, yPos*h + offsetY, xPos*w, yPos*h+hRawBlob*_scaleRawDims);
-    
-    //TODO 
+    //line(xPos*w + OFFSET_X, yPos*h + OFFSET_Y, xPos*w, yPos*h+hRawBlob*_scaleRawDims);
+
+    //TODO
     //Draw Spout here
     popStyle();
   }
@@ -126,7 +126,7 @@ class YoloBlob { //<>// //<>//
 
   //-------------------------------------------------
   void displayActionCircles(int w, int h, float _scaleRawDims){
-     
+
    int idColor = id*100 % 255; // Using Id to set a Hue color
     fill(idColor, 255, 255, 200);
     noStroke();
