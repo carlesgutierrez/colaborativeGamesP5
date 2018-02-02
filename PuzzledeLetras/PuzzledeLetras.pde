@@ -1,4 +1,4 @@
-import sprites.*; //<>// //<>// //<>// //<>//
+import sprites.*;   //<>//
 import sprites.maths.*;
 import sprites.utils.*;
 
@@ -42,8 +42,10 @@ PVector dimCurrentRect;
 Intro intro = new Intro(this);
 Puzzle puzzle = new Puzzle();
 Sprite llama;
-int status = 0;
+
+int status = STATUS_INTRO;
 boolean fake = true;
+String images[];
 
 int startTime = millis();
 int figureTime = millis();
@@ -56,7 +58,9 @@ void setup() {
 
   intro.setup();
   puzzle.setup(COLUMNS, ROWS, gapX, gapY, OFFSET_X, OFFSET_Y);
-  img = loadImage("img01.jpg");
+
+  loadImages();
+  initImage();
 
   //Current
   currentRect = new PVector(0, 0);
@@ -125,7 +129,7 @@ void draw() {
     if (timeElapsed > 5 * 1000) {
       println("Clearing the canvas");
       puzzle.clear();
-      img = loadImage("img0"+(int)random(1, 9)+".jpg");
+      initImage();
       status = 0;
     } else {
       image(img, OFFSET_X, OFFSET_Y);
@@ -136,6 +140,44 @@ void draw() {
 }
 
 
+void keyPressed() {
+  switch(keyCode) {
+  case KEY_INTRO:
+    status = STATUS_INTRO;
+    break;
+  case  KEY_PLAY: // Start game
+    status = STATUS_PLAYING;
+    break;
+  case  KEY_IMAGE: // 'i' change image
+    initImage();
+    break;
+  case  KEY_CLEAR: // 'c' clear image
+    puzzle.clear();
+    break;
+  case  KEY_END_GAME: // 'e' // End game
+    println("Finish game");
+    puzzle.fill();
+    startTime = millis();
+    //status = 2;
+    break;
+  case  KEY_RESTART: // 'e' // End game
+    startTime = millis();
+    status = STATUS_RESTART;
+    break;
+  case  KEY_FAKE: // 'f' (to toggle fake mode)
+    println("Changing fake mode to" + !fake);
+    fake = !fake;
+    break;
+  }
+}
+
+
+
+//=============================
+//  Helper functions
+//=============================
+
+// Update the puzzle
 void update() {
   if (fake) {
     updateMouse();
@@ -143,6 +185,8 @@ void update() {
     updateOSC();
   }
 }
+
+// Update the puzzle based on Mouse movement
 void updateMouse() {
   currentRect.set(mouseX, mouseY);
 
@@ -161,6 +205,7 @@ void updateMouse() {
   }
 }
 
+// Update the puzzle based on OSC events
 void updateOSC() {
   float Rscale = 0.2;
 
@@ -186,36 +231,27 @@ void updateOSC() {
   }
 }
 
-void keyPressed() {
-  switch(keyCode) {
-  case KEY_INTRO:
-    status = STATUS_INTRO;
-    break;
-  case  KEY_PLAY: // Start game
-    status = STATUS_PLAYING;
-    break;
-  case  KEY_IMAGE: // 'i' change image
-    img = loadImage("img0"+(int)random(1, 9)+".jpg");
-    break;
-  case  KEY_CLEAR: // 'c' clear image
-    puzzle.clear();
-    break;
-  case  KEY_END_GAME: // 'e' // End game
-    println("Finish game");
-    puzzle.fill();
-    startTime = millis();
-    //status = 2;
-    break;
-  case  KEY_RESTART: // 'e' // End game
-    startTime = millis();
-    status = STATUS_RESTART;
-    break;
-  case  KEY_FAKE: // 'f' (to toggle fake mode)
-    println("Changing fake mode to" + !fake);
-    fake = !fake;
-    break;
+// Load all available images from the data directory
+// Based on code of Daniel Shiffman (https://www.processing.org/examples/directorylist.html)
+void loadImages() {
+  String path = sketchPath() + "/data" ;  
+  File file = new File(path);
+  if (file.isDirectory()) {
+    images = file.list();
   }
 }
+
+// Initialize the background image verifying it has the right dimentions
+void initImage() {
+  String imageName = images[(int)random(images.length)];
+  img = loadImage(imageName);
+
+  while (img.width!=192 || img.height!=125) {
+    imageName = images[(int)random(images.length)];
+    img = loadImage(imageName);
+  }
+}
+
 /*
  * Method provided by Processing and is called every
  * loop before the draw method. It has to be activated
