@@ -55,6 +55,9 @@ void setup() {
   fullScreen();
   randomSeed(millis());
   noCursor();
+  
+  //text
+  setupText();
 
   intro.setup();
   puzzle.setup(COLUMNS, ROWS, gapX, gapY, OFFSET_X, OFFSET_Y);
@@ -85,6 +88,7 @@ void draw() {
     background(0, 0, 0);
   }
 
+
   strokeWeight(1);
   stroke(0, 255, 255); //RGB Contour Color. https://processing.org/reference/stroke_.html
   drawFacadeContourInside(); //Facade Contour
@@ -98,7 +102,7 @@ void draw() {
   case STATUS_INTRO:
     //TODO Init and restart the intro 'correctly'
     intro.draw();
-    if (timer.second() == 15) {
+    if (timer.second() == 15) { // TODO check sprite is end
       status = STATUS_PLAYING;
       timer.restart();
     }
@@ -132,6 +136,9 @@ void draw() {
     }
     break;
   }
+  
+  //text
+  drawText();
 }
 
 
