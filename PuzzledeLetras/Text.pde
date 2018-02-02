@@ -48,7 +48,7 @@ void drawText() {
       //text("Descubre tu Barrio", titleScreenX, titleScreenY);
       String result = imageName; 
       int numChars = result.length();
-      text(result.substring(0, numChars-4), titleScreenX, titleScreenY);
+      text(result.substring(3, numChars-4), titleScreenX, titleScreenY);
     }
     break;
   }
