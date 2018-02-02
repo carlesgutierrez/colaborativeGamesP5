@@ -9,6 +9,8 @@ int heightDesiredScale = 157;
 Boolean bBackgroundAlpha = false;
 int alphaBk = 200;
 
+String imageName;
+
 // Number of columns
 final int COLUMNS = 24;
 // Numbers of rows
@@ -230,7 +232,7 @@ void updateOSC() {
 // Load all available images from the data directory
 // Based on code of Daniel Shiffman (https://www.processing.org/examples/directorylist.html)
 void loadImages() {
-  String path = sketchPath() + "/data" ;
+  String path = sketchPath() + "/data/images" ;
   File file = new File(path);
   if (file.isDirectory()) {
     images = file.list();
@@ -239,12 +241,12 @@ void loadImages() {
 
 // Initialize the background image verifying it has the right dimentions
 void initImage() {
-  String imageName = images[(int)random(images.length)];
-  img = loadImage(imageName);
+  imageName = images[(int)random(images.length)];
+  img = loadImage("data/images/"+imageName);
 
   while (img.width!=192 || img.height!=125) {
     imageName = images[(int)random(images.length)];
-    img = loadImage(imageName);
+    img = loadImage("/data/images/"+imageName);
   }
 }
 
