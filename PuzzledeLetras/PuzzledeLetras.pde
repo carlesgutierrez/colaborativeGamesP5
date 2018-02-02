@@ -246,7 +246,7 @@ void initImage() {
 
   while (img.width!=192 || img.height!=125) {
     imageName = images[(int)random(images.length)];
-    img = loadImage("/data/images/"+imageName);
+    img = loadImage("data/images/"+imageName);
   }
 }
 
